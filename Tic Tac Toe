@@ -1,0 +1,202 @@
+package TicTacToe;
+
+import java.util.Scanner;
+//create board for tic tac toe
+public class Board {
+	//player one symbol
+	//player two symbol
+	//size
+	//count
+	private char board[][];
+	Scanner s=new Scanner(System.in);
+	//System.out.println("enter board size");
+	private int boardsize=3;
+	private char player1symbol,player2symbol;
+	//count the number of cell that are filled.
+	private int count;
+	private static final char EMPTY=' ';
+	public static final int PLAYER1WINS=1;
+	public static final int PLAYER2WINS=2;
+	public static final int DRAWS=3;
+	public static final int INCOMPLITE=4;
+	public static final int INVALIDMOVE=5;
+	//create constructor to initialize
+	public Board(char p1symbol,char p2symbol) {
+		board=new char[boardsize][boardsize];
+		for(int i=0;i<boardsize;i++) {
+			for(int j=0;j<boardsize;j++) {
+				board[i][j]=EMPTY;
+				
+			}
+		}
+		this.player1symbol=player1symbol;
+		this .player2symbol=player2symbol;
+	}
+	
+	public int move(char symbol, int x, int y) {
+		if(x<0 || x>=boardsize ||y<0||y>=boardsize || board[x][y]!=EMPTY ) {
+			return INVALIDMOVE;
+		}
+//		if(board[x][y]!=EMPTY) {
+//			return INVALIDMOVE;
+//		}
+		board[x][y]=symbol;
+		count++;
+		//row
+		if(board[x][0]==board[x][1] && board[x][0]==board[x][2]) {
+			return symbol== player1symbol ? PLAYER1WINS : PLAYER2WINS;
+		}
+		//column
+		 if(board[0][y]==board[1][y] && board[0][y]==board[2][y]) {
+			return symbol== player1symbol ? PLAYER1WINS : PLAYER2WINS;
+		}
+		 // 1st Digonals
+		 if(board[0][0]!=EMPTY && board[0][0]==board[1][1] && board[0][0]==board[2][2]) {
+				return symbol==player1symbol ? PLAYER1WINS : PLAYER2WINS;
+			}
+		 //2nd digonal
+		 if(board[0][2]!=EMPTY && board[0][2]==board[1][1] && board[0][2]==board[2][0]) {
+				return symbol==player1symbol ? PLAYER1WINS : PLAYER2WINS;
+			}
+		 if(count==boardsize * boardsize) {
+			 return DRAWS;
+		 }
+		 return INCOMPLITE;
+	}
+	public void print() {
+		System.out.println("-----------------");
+		for(int i=0;i<boardsize;i++) {
+			for(int j=0;j<boardsize;j++) {
+				System.out.print("|"+board[i][j]+"|");
+			}
+			System.out.println();
+		}
+		System.out.println();
+		System.out.println("----------------");
+	}
+
+}
+//create method for players of tic tac toe
+package TicTacToe;
+
+public class Player {
+	//1 name of player
+	//symbol of player
+	//who won the game
+	
+private String name;
+private char symbol;
+//create constructor initialize value
+public Player(String name,char symbol) {
+	setName(name);
+	setSymbol(symbol);
+}
+public void setName(String name) {
+	if(!name.isEmpty()) {
+		this .name=name;
+	}
+}
+	public String getName() {
+		return this.name;
+	}
+	public void setSymbol(char symbol) {
+		if(symbol!='\0') {
+			this .symbol=symbol;
+		}
+	}
+	public char getSymbol() {
+		return this.symbol;
+	}
+}
+//create method for start game or move players
+package TicTacToe;
+
+import java.util.Scanner;
+
+public class TicTacToe {
+//player1
+	//player2
+	//board
+	private Player player1,player2;
+	private Board board;
+	private int numplayers;
+	
+	public static void main(String []args) {
+		TicTacToe t=new TicTacToe();
+		t.StartGame();
+	}
+	public void StartGame() {
+		Scanner s=new Scanner(System.in);
+		//take player input
+		player1=takeplayerInput(++numplayers);
+		player2=takeplayerInput(++numplayers);
+		while(player1.getSymbol()==player2.getSymbol()) {
+			System.out.println("symbol already taken!! choose again symbol");
+			player2.setSymbol(s.next().charAt(0));
+		}
+		//create the board
+		board=new Board(player1.getSymbol(),player2.getSymbol());
+		//play the game
+		boolean player1turn=true;
+		int status=Board.INCOMPLITE;
+		while(status==Board.INCOMPLITE || status==Board.INVALIDMOVE) {
+			if(player1turn) {
+				System.out.println("player-1- "+player1.getName()+"'s turn");
+				System.out.println("Enter x: ");
+				int x=s.nextInt();
+				System.out.println("Enter y: ");
+				int y=s.nextInt();
+				 status =board.move(player1.getSymbol(),x,y);
+				if(status==Board.INVALIDMOVE) {
+					System.out.println("invalid move !!please try again");
+					continue;
+				}
+//				else {
+//					player1turn=false;
+//					board.print();
+//				}
+			}
+			else {
+				System.out.println("player-2- "+player2.getName()+"'s turn");
+				System.out.println("Enter x : ");
+				int x=s.nextInt();
+				System.out.println("Enter y : ");
+				int y=s.nextInt();
+				 status =board.move(player2.getSymbol(),x,y);
+				if(status==Board.INVALIDMOVE) {
+					System.out.println("invalid move !!please try again");
+					continue;
+				}
+//				else {
+//					player1turn=true;
+//				}
+				
+			}
+			player1turn=!player1turn;
+			board.print();
+		}
+		if(status==Board.PLAYER1WINS) {
+			System.out.println("player-1 "+player1.getName()+" wins");
+		}
+		else if(status==Board.PLAYER2WINS) {
+			System.out.println("player-2 "+player2.getName()+" wins");
+		}
+		else {
+			System.out.println("Match Draw");
+		}
+	}
+	//create method for playerinput
+	private Player takeplayerInput(int num) {
+		Scanner s=new Scanner(System.in);
+		System.out.println("Enter player"+num+"name:");
+		String name=s.nextLine();
+		System.out.println("Enter player"+num+"symbol:");
+		char symbol=s.next().charAt(0);
+		Player p=new Player(name,symbol);
+		return p;
+	}
+	
+}
+
+
+
